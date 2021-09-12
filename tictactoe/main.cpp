@@ -10,12 +10,21 @@ bool checkWin(std::vector<char>&, int);
 int main() {
 	// TicTacToe console-app.
 	const int row_col_length = 3;  // length of each row and column in game board.
+	char want_to_play{'y'};  // stores the answer to "play again?".
 
-	// stores number of and state of each square on game board:
-	std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	while (tolower(want_to_play == 'y'))
+	{
+		// stores number of and state of each square on game board:
+		std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-	gamePlayLoop(table, row_col_length);  // runs gameplay loop.
-	system("pause"); // waits for keypress before closing window.
+		gamePlayLoop(table, row_col_length);  // runs gameplay loop.
+		
+		system("pause"); // waits for keypress before closing window.
+		system("cls");
+
+		std::cout << " Do you wan't to play again? (y/n): ";
+		std::cin >> want_to_play;
+	}
 
 	return 0;
 }
@@ -81,7 +90,7 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 			}
 
 			// asks for input:
-			std::cout << "Player " << player << " select a number from the board: ";
+			std::cout << "Player " << player << ", select a number from the board: ";
 			std::cin >> selection;
 
 			// marks selected square if it's not already marked:
