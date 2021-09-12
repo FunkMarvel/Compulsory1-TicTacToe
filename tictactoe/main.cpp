@@ -15,6 +15,7 @@ int main() {
 	std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 	gamePlayLoop(table, row_col_length);  // runs gameplay loop.
+	system("pause"); // waits for keypress before closing window.
 
 	return 0;
 }
