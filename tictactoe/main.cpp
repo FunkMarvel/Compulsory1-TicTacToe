@@ -9,9 +9,13 @@ bool checkWin(std::vector<char>&, int);
 
 int main() {
 	// TicTacToe console-app.
-	const int row_col_length = 3;
+	const int row_col_length = 3;  // length of each row and column in game board.
+
+	// stores number of and state of each square on game board:
 	std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
-	gamePlayLoop(table, row_col_length);
+
+	gamePlayLoop(table, row_col_length);  // runs gameplay loop.
+
 	return 0;
 }
 
@@ -111,7 +115,8 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 
 bool checkWin(std::vector<char> &table, int rcl)
 {
-	// Function that checks entire board and returns a bool of value true if a win has been reached and value false if no win has been reached.
+	// Function that checks entire board and returns a bool of value true
+	// if a win has been reached and value false if no win has been reached.
 	// Args:
 	//	&table - vector of chars passed by refrence,
 	//			 containing the squares of the board.
