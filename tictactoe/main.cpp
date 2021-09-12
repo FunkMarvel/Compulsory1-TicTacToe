@@ -8,6 +8,7 @@ void selection(std::vector<char>&, int);
 bool checkWin(std::vector<char>&, int);
 
 int main() {
+	// TicTacToe console-app.
 	const int row_col_length = 3;
 	std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 	selection(table, row_col_length);
