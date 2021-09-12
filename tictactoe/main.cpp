@@ -55,9 +55,8 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 	//			 containing the squares of the board.
 	//	rcl - integer representing the dimension n of the n*n game board.
 
-	// creating variables:
 	int selection{};  // stores the number corresponding to selected square.
-	int turn_number{0};  // stores the number of turns that have passed.
+	int turn_number{};  // stores the number of turns that have passed.
 	int player{};  // stores the player number.
 	char mark{};  // stores the mark to use when updating the board ('x' or 'o').
 
