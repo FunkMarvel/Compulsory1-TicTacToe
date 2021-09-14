@@ -7,7 +7,7 @@
 void displayTable(std::vector<char>&, int);
 void gamePlayLoop(std::vector<char>&, int);
 bool checkWin(std::vector<char>&, int);
-int aiSelection(std::vector<char>&, int, int);
+int aiSelection(std::vector<char>&, int);
 
 int main() {
 	// TicTacToe console-app.
@@ -95,14 +95,14 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 				player = 2;
 				mark = 'o';
 			}
-			if (player == 1 || ai_on == 'y')
+			if (player == 1 || ai_on == 'n')
 			{
 				std::cout << "Player " << player << " select a number from the board: ";
 				std::cin >> selection;
 			}
 			else
 			{
-				selection = aiSelection(table, selection, rcl);
+				selection = aiSelection(table, rcl);
 			}
 
 			// marks selected square if it's not already marked:
@@ -168,7 +168,7 @@ bool checkWin(std::vector<char> &table, int rcl)
 	return false;  // returns false if end of function is reached. 
 }
 
-int aiSelection(std::vector<char> &table, int prev_select, int rcl)
+int aiSelection(std::vector<char> &table, int rcl)
 {
 	std::vector<char> test_table(table.size());
 	std::vector<int> possible_selections{};
@@ -182,6 +182,12 @@ int aiSelection(std::vector<char> &table, int prev_select, int rcl)
 		if (test_table[i] != 'x' && test_table[i] != 'o') {
 			test_table[i] = 'o';
 			if (checkWin(test_table, rcl)) { return i + 1; }
+			
+			test_table[i] = 'x';
+			if (checkWin(test_table, rcl)) { return i + 1; }
+
+			if (i == 4) return i + 1;
+
 			possible_selections.push_back(i);
 			test_table[i] = table[i];
 		}
