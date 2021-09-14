@@ -78,22 +78,24 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 	std::cin >> ai_on;
 	ai_on = tolower(ai_on);
 	
-	std::cout << std::endl;
-	std::cout << " 1. Easy\n 2. Medium\n 3. Hard" << std::endl;
-	std::cout << " Select difficulty: ";
-	std::cin >> difficulty;
+	if (ai_on == 'y') {
+		std::cout << std::endl;
+		std::cout << " 1. Easy\n 2. Medium\n 3. Hard" << std::endl;
+		std::cout << " Select difficulty: ";
+		std::cin >> difficulty;
 
-	switch (tolower(difficulty))
-	{
-	case '1': case 'e': default:
-		weight = 0.9;
-		break;
-	case '2': case 'm':
-		weight = 0.4;
-		break;
-	case '3': case 'h':
-		weight = 0.1;
-		break;
+		switch (tolower(difficulty))
+		{
+		case '1': case 'e': default:
+			weight = 0.9;
+			break;
+		case '2': case 'm':
+			weight = 0.5;
+			break;
+		case '3': case 'h':
+			weight = 0.1;
+			break;
+		}
 	}
 
 	// the primary gameplay loop:
@@ -115,6 +117,8 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 				player = 2;
 				mark = 'o';
 			}
+
+			// checks if ai is on:
 			if (player == 1 || ai_on == 'n')
 			{
 				std::cout << "Player " << player << " (" << mark << ") select a number from the board: ";
@@ -122,7 +126,7 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 			}
 			else
 			{
-				selection = aiSelection(table, rcl, weight);
+				selection = aiSelection(table, rcl, weight);  // performs ai selection if ai is enabled.
 			}
 
 			// marks selected square if it's not already marked:
@@ -190,42 +194,71 @@ bool checkWin(std::vector<char> &table, int rcl)
 
 int aiSelection(std::vector<char>& table, int rcl, double weight)
 {
-	std::vector<char> test_table(table.size());
-	std::vector<int> possible_selections{};
-	int possible_win{ -1 };
-	int possible_loss{ -1 };
-	int selection{};
-	bool middle_free{ false };
+	// Function making ai selection. Returns integer corresponding to selected square.
+	// Args:
+	//	&table - vector of chars passed by refrence,
+	//			 containing the squares of the board.
+	//	rcl - integer representing the dimension n of the n*n game board.
+	//	weight - double between 0 and 1 corresponding to selected difficulty.
 
+	int selection{};  // return variable.
+
+	// creates copy of current game board state:
+	std::vector<char> test_table(table.size());
 	std::copy(table.begin(), table.end(), test_table.begin());
+	
+	// variables for storing indices that can be selected:
+	std::vector<int> possible_selections{};
+	int possible_win{ -1 };  // stores index of winning move.
+	int possible_loss{ -1 };  // stores index of losing move.
+	bool middle_free{ false };  // stores state of middle square.
+
 
 	// looping through table:
 	for (int i = 0; i < rcl * rcl; i++)
 	{
+		// finds empty squares:
 		if (test_table[i] != 'x' && test_table[i] != 'o') {
+
+			// checks if current square can lead to win if selected:
 			test_table[i] = 'o';
-			if (checkWin(test_table, rcl)) possible_win = i;
+			if (checkWin(test_table, rcl)) possible_win = i;  // stores index of winning selection.
 
+			// checks if current square can lead to loss if not selected:
 			test_table[i] = 'x';
-			if (checkWin(test_table, rcl)) possible_loss = i;
+			if (checkWin(test_table, rcl)) possible_loss = i;  // stores index of possible loss.
 
-			if (i == 4) { middle_free = true; }
-			else { possible_selections.push_back(i); }
-			test_table[i] = table[i];
+			if (i == 4) { middle_free = true; } // checks if middle is free.
+			else { possible_selections.push_back(i); }  // stores index of square if free and not middle.
+			test_table[i] = table[i];  // resets value of current square to match the current state of the game.
 		}
 	}
 
+	// creates random number genenrator for ai behaviour:
 	std::random_device rd{};
 	std::mt19937_64 gen(rd());
-	std::uniform_real_distribution<double> real_dist(0, 1);
-	std::uniform_int_distribution<int> int_dist(0, possible_selections.size() - 1);
+	std::uniform_real_distribution<double> real_dist(0, 1);  // real distrobution for comparing with weight.
+	std::uniform_int_distribution<int> int_dist(0, possible_selections.size() - 1);  // int distrobution for random selection.
+	
+	double percent = real_dist(gen); // Draws a random real number between 0 and 1 to compare with difficulty weight.
+	// A lower weight makes the ai more likely to play correct moves, and thus increases the difficulty.
+	
+	if (percent > weight && possible_win >= 0) {
+		// possible win is selected if random number is bigger than the difficulty weight:
+		selection = possible_win;
+	}
+	else if (percent > weight && possible_loss >= 0) {
+		// possible loss is prevented if random number is bigger than the difficulty weight:
+		selection = possible_loss;
+	}
+	else if (middle_free) {
+		// middle is selected if it is free:
+		selection = 4;
+	}
+	else {
+		// if no other selection has been made, then a random free square is chosen:
+		selection = possible_selections[int_dist(gen)];
+	}
 
-	double percent = real_dist(gen);
-
-	if (percent > weight && possible_win >= 0) { selection = possible_win; }
-	else if (percent > weight && possible_loss >= 0) { selection = possible_loss; }
-	else if (middle_free) { selection = 4; }
-	else { selection = possible_selections[int_dist(gen)]; }
-
-	return selection + 1;
+	return selection + 1;  // returns number of selected square.
 }
