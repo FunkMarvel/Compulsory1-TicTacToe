@@ -2,10 +2,12 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
 
 void displayTable(std::vector<char>&, int);
 void gamePlayLoop(std::vector<char>&, int);
 bool checkWin(std::vector<char>&, int);
+int aiSelection(std::vector<char>&, int, int);
 
 int main() {
 	// TicTacToe console-app.
@@ -60,6 +62,11 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 	int turn_number{0};  // stores the number of turns that have passed.
 	int player{};  // stores the player number.
 	char mark{};  // stores the mark to use when updating the board ('x' or 'o').
+	char ai_on{};
+
+	std::cout << "Play against Ai? y/n: " << std::endl;
+	std::cin >> ai_on;
+	ai_on = tolower(ai_on);
 
 	// the primary gameplay loop:
 	while (turn_number < 9) {  // loop stops when maximum number of turns have been met.
@@ -82,8 +89,15 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 			}
 
 			// asks for input:
-			std::cout << "Player " << player << " select a number from the board: ";
-			std::cin >> selection;
+			if (player == 1 || ai_on == 'y')
+			{
+				std::cout << "Player " << player << " select a number from the board: ";
+				std::cin >> selection;
+			}
+			else
+			{
+				selection = aiSelection(table, selection, rcl);
+			}
 
 			// marks selected square if it's not already marked:
 			if (selection > 0 && selection < 10 && table[selection - 1] != 'x' && table[selection - 1] != 'o')
@@ -146,4 +160,30 @@ bool checkWin(std::vector<char> &table, int rcl)
 	if (win) return win;
 
 	return false;  // returns false if end of function is reached. 
+}
+
+int aiSelection(std::vector<char> &table, int prev_select, int rcl)
+{
+	std::vector<char> test_table(table.size());
+	std::vector<int> possible_selections{};
+	int selection{};
+
+	std::copy(table.begin(), table.end(), test_table.begin());
+
+	// looping through table:
+	for (int i = 0; i < rcl*rcl; i++)
+	{
+		if (test_table[i] != 'x' && test_table[i] != 'o') {
+			test_table[i] = 'o';
+			if (checkWin(test_table, rcl)) { return i + 1; }
+			possible_selections.push_back(i);
+			test_table[i] = table[i];
+		}
+	}
+
+	std::random_device rd{};
+	std::mt19937_64 gen(rd());
+	std::uniform_int_distribution<int> RNG(0, possible_selections.size() - 1);
+
+	return possible_selections[RNG(gen)] + 1;
 }
