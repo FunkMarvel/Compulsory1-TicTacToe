@@ -96,11 +96,11 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 			switch (tolower(difficulty))
 			{
 			case '1': case 'e':
-				weight = 0.9;
+				weight = 0.8;
 				difficulty_selected = true;
 				break;
 			case '2': case 'm':
-				weight = 0.5;
+				weight = 0.4;
 				difficulty_selected = true;
 				break;
 			case '3': case 'h':
