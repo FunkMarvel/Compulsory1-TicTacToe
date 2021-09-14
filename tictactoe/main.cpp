@@ -70,31 +70,47 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 	int turn_number{};  // stores the number of turns that have passed.
 	int player{};  // stores the player number.
 	char mark{};  // stores the mark to use when updating the board ('x' or 'o').
-	char ai_on{};
-	char difficulty{'1'};
-	double weight{};
+	char ai_on{};  // stores answer to ai on question.
+	char difficulty{};  // stores difficulty level.
+	double weight{};  // stores the weight corresponding to each difficulty.
+	bool difficulty_selected{ false };
 
-	std::cout << " Play against Ai? y/n: ";
-	std::cin >> ai_on;
-	ai_on = tolower(ai_on);
+	while (ai_on != 'y' && ai_on != 'n')  // loops until valid selection is made.
+	{
+		// asks if ai should be used:
+		std::cout << " Play against Ai? y/n: ";
+		std::cin >> ai_on;
+		ai_on = tolower(ai_on);
+		system("cls");
+	}
 	
-	if (ai_on == 'y') {
-		std::cout << std::endl;
-		std::cout << " 1. Easy\n 2. Medium\n 3. Hard" << std::endl;
-		std::cout << " Select difficulty: ";
-		std::cin >> difficulty;
-
-		switch (tolower(difficulty))
+	if (ai_on == 'y') {  // difficulty selection if ai is used:
+		while (!difficulty_selected)  // loops until valid selection is made:
 		{
-		case '1': case 'e': default:
-			weight = 0.9;
-			break;
-		case '2': case 'm':
-			weight = 0.5;
-			break;
-		case '3': case 'h':
-			weight = 0.1;
-			break;
+			std::cout << std::endl;
+			std::cout << " 1. Easy\n 2. Medium\n 3. Hard" << std::endl;
+			std::cout << " Select difficulty: ";
+			std::cin >> difficulty;
+
+			// sets weight according to selected difficulty:
+			switch (tolower(difficulty))
+			{
+			case '1': case 'e':
+				weight = 0.9;
+				difficulty_selected = true;
+				break;
+			case '2': case 'm':
+				weight = 0.5;
+				difficulty_selected = true;
+				break;
+			case '3': case 'h':
+				weight = 0.1;
+				difficulty_selected = true;
+				break;
+			default:
+				break;
+			}
+			system("cls");
 		}
 	}
 
