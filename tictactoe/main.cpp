@@ -12,12 +12,21 @@ int aiSelection(std::vector<char>&, int, int);
 int main() {
 	// TicTacToe console-app.
 	const int row_col_length = 3;  // length of each row and column in game board.
+	char want_to_play{'y'};  // stores the answer to "play again?".
 
-	// stores number of and state of each square on game board:
-	std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
+	while (tolower(want_to_play == 'y'))
+	{
+		// stores number of and state of each square on game board:
+		std::vector<char> table = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-	gamePlayLoop(table, row_col_length);  // runs gameplay loop.
-	system("pause"); // waits for keypress before closing window.
+		gamePlayLoop(table, row_col_length);  // runs gameplay loop.
+		
+		system("pause"); // waits for keypress before closing window.
+		system("cls");
+
+		std::cout << " Do you wan't to play again? (y/n): ";
+		std::cin >> want_to_play;
+	}
 
 	return 0;
 }
@@ -57,9 +66,8 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 	//			 containing the squares of the board.
 	//	rcl - integer representing the dimension n of the n*n game board.
 
-	// creating variables:
 	int selection{};  // stores the number corresponding to selected square.
-	int turn_number{0};  // stores the number of turns that have passed.
+	int turn_number{};  // stores the number of turns that have passed.
 	int player{};  // stores the player number.
 	char mark{};  // stores the mark to use when updating the board ('x' or 'o').
 	char ai_on{};
@@ -87,8 +95,6 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 				player = 2;
 				mark = 'o';
 			}
-
-			// asks for input:
 			if (player == 1 || ai_on == 'y')
 			{
 				std::cout << "Player " << player << " select a number from the board: ";
