@@ -7,7 +7,7 @@
 void displayTable(std::vector<char>&, int);
 void gamePlayLoop(std::vector<char>&, int);
 bool checkWin(std::vector<char>&, int);
-int aiSelection(std::vector<char>&, int);
+int aiSelection(std::vector<char>&, int, double);
 
 int main() {
 	// TicTacToe console-app.
@@ -71,10 +71,30 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 	int player{};  // stores the player number.
 	char mark{};  // stores the mark to use when updating the board ('x' or 'o').
 	char ai_on{};
+	char difficulty{'1'};
+	double weight{};
 
-	std::cout << "Play against Ai? y/n: " << std::endl;
+	std::cout << " Play against Ai? y/n: ";
 	std::cin >> ai_on;
 	ai_on = tolower(ai_on);
+	
+	std::cout << std::endl;
+	std::cout << " 1. Easy\n 2. Medium\n 3. Hard" << std::endl;
+	std::cout << " Select difficulty: ";
+	std::cin >> difficulty;
+
+	switch (tolower(difficulty))
+	{
+	case '1': case 'e': default:
+		weight = 0.9;
+		break;
+	case '2': case 'm':
+		weight = 0.4;
+		break;
+	case '3': case 'h':
+		weight = 0.1;
+		break;
+	}
 
 	// the primary gameplay loop:
 	while (turn_number < 9) {  // loop stops when maximum number of turns have been met.
@@ -97,12 +117,12 @@ void gamePlayLoop(std::vector<char> &table, int rcl) {
 			}
 			if (player == 1 || ai_on == 'n')
 			{
-				std::cout << "Player " << player << " select a number from the board: ";
+				std::cout << "Player " << player << " (" << mark << ") select a number from the board: ";
 				std::cin >> selection;
 			}
 			else
 			{
-				selection = aiSelection(table, rcl);
+				selection = aiSelection(table, rcl, weight);
 			}
 
 			// marks selected square if it's not already marked:
@@ -168,34 +188,44 @@ bool checkWin(std::vector<char> &table, int rcl)
 	return false;  // returns false if end of function is reached. 
 }
 
-int aiSelection(std::vector<char> &table, int rcl)
+int aiSelection(std::vector<char>& table, int rcl, double weight)
 {
 	std::vector<char> test_table(table.size());
 	std::vector<int> possible_selections{};
+	int possible_win{ -1 };
+	int possible_loss{ -1 };
 	int selection{};
+	bool middle_free{ false };
 
 	std::copy(table.begin(), table.end(), test_table.begin());
 
 	// looping through table:
-	for (int i = 0; i < rcl*rcl; i++)
+	for (int i = 0; i < rcl * rcl; i++)
 	{
 		if (test_table[i] != 'x' && test_table[i] != 'o') {
 			test_table[i] = 'o';
-			if (checkWin(test_table, rcl)) { return i + 1; }
-			
+			if (checkWin(test_table, rcl)) possible_win = i;
+
 			test_table[i] = 'x';
-			if (checkWin(test_table, rcl)) { return i + 1; }
+			if (checkWin(test_table, rcl)) possible_loss = i;
 
-			if (i == 4) return i + 1;
-
-			possible_selections.push_back(i);
+			if (i == 4) { middle_free = true; }
+			else { possible_selections.push_back(i); }
 			test_table[i] = table[i];
 		}
 	}
 
 	std::random_device rd{};
 	std::mt19937_64 gen(rd());
-	std::uniform_int_distribution<int> RNG(0, possible_selections.size() - 1);
+	std::uniform_real_distribution<double> real_dist(0, 1);
+	std::uniform_int_distribution<int> int_dist(0, possible_selections.size() - 1);
 
-	return possible_selections[RNG(gen)] + 1;
+	double percent = real_dist(gen);
+
+	if (percent > weight && possible_win >= 0) { selection = possible_win; }
+	else if (percent > weight && possible_loss >= 0) { selection = possible_loss; }
+	else if (middle_free) { selection = 4; }
+	else { selection = possible_selections[int_dist(gen)]; }
+
+	return selection + 1;
 }
